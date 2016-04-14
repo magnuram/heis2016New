@@ -2,14 +2,14 @@ package drivers
 
 import (
 	//"C"
-	"config"
+
 	"log"
 )
 
-//const (
-//	N_FLOORS  = config.N_FLOORS  //Number of floors, Hardware-depentent
-//	N_BUTTONS = config.N_BUTTONS //Number of buttons/lamps on a per-floor basis
-//)
+const (
+	N_FLOORS  = 4 //Number of floors, Hardware-depentent
+	N_BUTTONS = 3 //Number of buttons/lamps on a per-floor basis
+)
 
 var lampChannelMatrix = [N_FLOORS][N_BUTTONS]int{
 	{LIGHT_UP1, LIGHT_DOWN1, LIGHT_COMMAND1},

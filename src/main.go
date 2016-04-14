@@ -1,12 +1,13 @@
 package main
 
 import (
-	"./driver"
+	"./drivers"
+	"./queue"
 )
 
 func main() {
 
 	for {
-
+		QueueSetLights()
 	}
 }

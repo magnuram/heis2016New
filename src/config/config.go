@@ -26,4 +26,19 @@ const (
 	MOVING    int = 2
 	DOORSOPEN int = 3
 	STOP      int = 4
+
+	//ELEVATOR TYPES
+	ELEVTYPE_COMEDI     int = 0
+	ELEVTYPE_SIMULATION int = 1
 )
+
+type ELINFO struct {
+	State     int
+	PrevFloor int
+	Dir       int
+	ReqUp     [N_FLOORS]int
+	ReqDown   [N_FLOORS]int
+	ReqLocal  [N_FLOORS]int
+}
+
+var Elinfo = ELINFO{}

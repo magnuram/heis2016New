@@ -1,5 +1,5 @@
 // channel.go gives readable names to the subdevices/channels used with the elevator
-package drivers
+package elev
 
 const (
 	//in port 4

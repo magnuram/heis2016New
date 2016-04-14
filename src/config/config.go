@@ -7,13 +7,13 @@ const (
 	N_BUTTONS   int = 3
 
 	//DIRECTIONS
-	DIR_UP   int = 1
-	DIR_DOWN int = -1
-	DIR_STOP int = 0
+	UP_DIR   int = 1
+	DOWN_DIR int = -1
+	STOP_DIR int = 0
 
 	//LIGHTS
-	LIGHT_ON  int = 1
-	LIGHT_OFF int = 0
+	ON  int = 1
+	OFF int = 0
 
 	//LAMP CALL
 	BUTTON_CALL_UP   int = 0
@@ -24,7 +24,7 @@ const (
 	INIT      int = 0
 	IDLE      int = 1
 	MOVING    int = 2
-	DOORSOPEN int = 3
+	DOOROPEN int = 3
 	STOP      int = 4
 
 	//ELEVATOR TYPES

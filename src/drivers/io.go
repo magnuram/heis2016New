@@ -1,4 +1,4 @@
-package drivers
+package driver
 
 /*
 #cgo CFLAGS: -std=c11

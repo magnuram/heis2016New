@@ -1,8 +1,9 @@
-package drivers
+package elev
 
 import (
 	//"C"
-
+	. "../channels"
+	. "../driver"
 	"log"
 )
 
@@ -83,13 +84,7 @@ func ElevSetDoorOpenLamp(value bool) {
 	}
 }
 
-func ElevSetStopLamp(value bool) {
-	if value {
-		IoSetBit(LIGHT_STOP)
-	} else {
-		IoClearBit(LIGHT_STOP)
-	}
-}
+
 
 func ElevGetButtonSignal(button int, floor int) bool {
 	if IoReadBit(buttonChannelMatrix[floor][button]) == true {
@@ -112,7 +107,7 @@ func ElevGetFloorSensorSignal() int {
 		return -1
 	}
 }
-
+//----------------DOESNT USE YET --------------//
 func ElevGetStopSignal() bool {
 	if IoReadBit(STOP_BUTTON) {
 		return true
@@ -120,6 +115,15 @@ func ElevGetStopSignal() bool {
 		return false
 	}
 }
+
+func ElevSetStopLamp(value bool) {
+	if value {
+		IoSetBit(LIGHT_STOP)
+	} else {
+		IoClearBit(LIGHT_STOP)
+	}
+}
+
 func ElevGetObstructionSignal() bool {
 	return IoReadBit(OBSTRUCTION)
 }

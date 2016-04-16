@@ -6,13 +6,9 @@ package driver
 #include "io.h"
 */
 import "C"
-import "errors"
 
-func IoInit() error {
-	if err := int(C.io_init()); err == 0 {
-		return errors.New("Could not init the IoInit")
-	}
-	return nil
+func IoInit() bool {
+	return int(C.io_init()) != 0
 }
 
 func IoSetBit(channel int) {

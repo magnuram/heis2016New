@@ -2,142 +2,81 @@ package fsm
 
 import (
 	. "../config"
-	. "../queue"
-	. "../elev"
-	"fmt"
-	"time"
+	//. "../queue"
+	//. "../elev"
+	"log"
+	//"time"
 )
 
-var currentState int = Elinf.State
-var direction int = 0
-var currentFloor int = -1
-const openTime = time.sleep(3000*time.Millisecond)
+var state int
+var floor int
+var dir int
 
-func FsmInit() {
+type Channels struct {
+	//Events
+	NewOrder     chan bool
+	FloorReached chan int
+	doorTimeout  chan bool
+	//Hardware interaction
+	MotorDir  chan int
+	FloorLamp chan int
+	DoorLamp  chan bool
+	//Door timer
+	doorTimerReset chan bool
+	//Network Interaction
+	OutgoingMsg chan Message
+}
+
+func FsmInit(ch Channels, startFloor int) {
+	state = IDLE
+	dir = STOP_DIR
+	floor = startFloor
+
+}
+
+func run(ch Channels) {
 	for {
-		if ElevGetFloorSensorSignal() != -1 {
-			break
-		}
-		ElevSetMotorDirection(DOWN_DIR)
-		var floor int = ElevGetFloorSensorSignal()
-		if floor != 1 {
-			currentFloor = floor
-			ElevSetMotorDirection(STOP_DIR)
+		select {
+		case <-ch.NewOrder:
+			eventNewOrder(ch)
+
+		case floor := <-ch.FloorReached:
+			eventFloorReached(ch, floor)
+			//case <-ch.doorTimeout:
 		}
 	}
-	currentState = IDLE
-	fmt.Println("State:", currentState)
 }
 
-func FsmOrderExist() {
-	switch currentState {
-	case INIT:
-		direction = QChooseDir(currentFloor, direction)
-		ElevSetMotorDirection(direction)
-		currentState = MOVING
-		break
+func eventNewOrder(ch Channels) {
+	switch state {
 	case IDLE:
-		direction = QChooseDir(currentFloor, direction)
-		ElevSetMotorDirection(direction)
-		currentState = MOVING
-		break
+		ch.DoorLamp <- true
+		state = DOOROPEN
 	case MOVING:
-		break
+
 	case DOOROPEN:
-		ElevSetDoorOpenLamp(OFF)
-		direction = QChooseDir(currentFloor, direction)
+		CloseConnectionChan <- true
 
-		currentState = MOVING
-		break
-
-	case STOP:
-		break
+	default:
+		CloseConnectionChan <- true
+		Restart.Run()
 	}
 }
 
-
-func FsmCorrectFloorReached(newFloor int) {
-	currentFloor = newFloor
-
-	switch currentState{
-	case INIT:
-		ElevSetDoorOpenLamp(ON)
-		currentState = DOOROPEN
-		openTime
-		break
-	case IDLE:
-		ElevSetMotorDirection(STOP_DIR)
-		direction = STOP_DIR
-		ElevSetDoorOpenLamp(ON)
-		currentState = DOOROPEN
-		openTime
-		break
+func eventFloorReached(ch Channels, newFloor int) {
+	log.Printf("%sEVENT: Floor %d reached in state", newFloor+1)
+	floor = newFloor
+	ch.FloorLamp <- floor
+	switch state {
 	case MOVING:
-		if QShouldStop(currentFloor,direction) == 0{
-			ElevSetMotorDirection(STOP_DIR)
-			ElevSetDoorOpenLamp(ON)
-			currentState = DOOROPEN
-			openTime
-		}
-		break
-	case DOOROPEN:
-	break
-	case STOP:
-		break
-	}
-}
+		ch.DoorLamp <- true
+		dir = STOP_DIR
+		ch.MotorDir <- dir
+		state = DOOROPEN
 
-func FsmButtonPressed(btnPressed int, flr int){
-	switch currentState{
-	case INIT:
-		QAddOrder(flr,btnPressed)
-		break
-	case IDLE:
-		QAddOrder(flr,btnPressed)
-		break
-	case MOVING:
-		QAddOrder(flr,btnPressed)
-		break
-	case DOOROPEN:
-		QAddOrder(flr,btnPressed)
-		break
-	case STOP:
-		break
-	}
-}
+	default:
+		CloseConnectionChan <- true
+		Restart.Run()
 
-func FsmTimeOut() {
-	case INIT:
-		break
-	case IDLE:
-		break
-	case MOVING:
-		break
-	case DOOROPEN:
-		openTime
-		ElevSetDoorOpenLamp(OFF)
-		for i := 0; i > 3 ; i++ {
-			ElevSetButtonLamp(i, currentFloor, OFF)
-		}
-		direction = QChooseDir(currentFloor,direction)
-		ElevSetMotorDirection(direction)
-		QDeleteManual(currentFloor,direction)
-		if direction == STOP_DIR{
-			currentState = IDLE
-		}else{
-			currentState = MOVING
-		}
-		break
-	case STOP:
-		break
-}
-
-func FsmSetIndicator() {
-	for i := 0; i < N_FLOORS; i++ {
-		if ElevGetFloorSensorSignal() == i{
-			ElevSetFloorIndicator(i)
-		}
-		
 	}
-	
 }

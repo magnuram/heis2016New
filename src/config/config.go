@@ -1,5 +1,9 @@
 package config
 
+import (
+	"os/exec"
+)
+
 const (
 	//QUANTITY
 	N_FLOORS    int = 4
@@ -12,33 +16,47 @@ const (
 	STOP_DIR int = 0
 
 	//LIGHTS
-	ON  int = 1
-	OFF int = 0
+	ON  bool = true
+	OFF bool = false
 
 	//LAMP CALL
-	BUTTON_CALL_UP   int = 0
-	BUTTON_CALL_DOWN int = 1
-	BUTTON_COMMAND   int = 2
+	BtnUp     int = 0
+	BtnDown   int = 1
+	BtnInside int = 2
 
 	//STATES
-	INIT      int = 0
-	IDLE      int = 1
-	MOVING    int = 2
-	DOOROPEN int = 3
-	STOP      int = 4
 
-	//ELEVATOR TYPES
-	ELEVTYPE_COMEDI     int = 0
-	ELEVTYPE_SIMULATION int = 1
+	IDLE     int = 0
+	MOVING   int = 1
+	DOOROPEN int = 2
 )
 
+// Start a new terminal when restart.Run()
+var Restart = exec.Command("gnome-terminal", "-x", "sh", "-c", "go run main.go")
+
+var CloseConnectionChan = make(chan bool)
+
+type ButtonPress struct {
+	Button int
+	Floor  int
+}
+
 type ELINFO struct {
-	State     int
-	PrevFloor int
-	Dir       int
-	ReqUp     [N_FLOORS]int
-	ReqDown   [N_FLOORS]int
-	ReqLocal  [N_FLOORS]int
+	State    int
+	Floor    int
+	Dir      int
+	ReqUp    [N_FLOORS]int
+	ReqDown  [N_FLOORS]int
+	ReqLocal [N_FLOORS]int
 }
 
 var Elinfo = ELINFO{}
+
+// Network message
+type Message struct {
+	Category int
+	Floor    int
+	Button   int
+	Cost     int
+	Addr     string `json:"-"`
+}
